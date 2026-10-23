@@ -1,6 +1,6 @@
 # F&T Auto Services — Tyres Landing Page
 
-Single-page marketing site for F&T Auto Services (Dubai tyre shop and mobile tyre fitting), built with Vite, React 19 and TypeScript.
+Single-page marketing site for F&T Auto Services (Al Quoz 3, Dubai tyre shop and auto repair workshop), built with Vite, React 19 and TypeScript.
 
 ## Commands
 
