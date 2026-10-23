@@ -1,6 +1,28 @@
-# React + TypeScript + Vite
+# F&T Auto Services — Tyres Landing Page
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Single-page marketing site for F&T Auto Services (Dubai tyre shop and mobile tyre fitting), built with Vite, React 19 and TypeScript.
+
+## Commands
+
+- `npm run dev` — start the dev server
+- `npm run build` — type-check and build to `dist/`
+- `npm run lint` — run ESLint
+- `npm run preview` — serve the production build
+
+## Brand asset credits
+
+Vehicle manufacturer marks in `public/images/logos/` are sourced from Wikimedia Commons and keep their original brand colours:
+
+- Mercedes-Benz star — `File:Mercedes-Benz Star.svg` (public domain, Mercedes-Benz)
+- BMW roundel — `File:BMW logo (gray).svg` (public domain, BMW)
+- Audi rings — `File:Audi Firmenlogo 1978 bis 1995.svg` (public domain, Audi)
+- Land Rover / Range Rover oval — `File:Land Rover 1978 logo.svg` (public domain, British Leyland)
+- Porsche crest — `File:Porsche-seeklogo.svg` (CC BY 4.0, Kai xzzrs)
+- Toyota emblem — `File:Toyota logo (Red).svg` (public domain, Toyota)
+
+---
+
+## Template reference
 
 Currently, two official plugins are available:
 
