@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowRight, Battery, Check, ChevronDown, Clock3, Disc3, Gauge, MapPin, Menu, MessageCircle, Phone, ShieldCheck, Star, Wrench, X } from 'lucide-react'
+import { AlertCircle, ArrowRight, Battery, Check, CheckCircle2, ChevronDown, Clock3, Disc3, Gauge, MapPin, Menu, MessageCircle, Phone, ShieldCheck, Star, Wrench, X } from 'lucide-react'
 import './App.css'
 
 const phone = '+971 56 477 1478'
@@ -7,6 +7,9 @@ const phoneLink = 'tel:+971564771478'
 const whatsapp = 'https://wa.me/971564771478?text=Hi%20F%26T%20Auto%20Services%2C%20I%20need%20tyre%20or%20car%20repair%20assistance.'
 const businessAddress = '3 Umm Suqeim St - Al Qouz Ind.third - Al Quoz - Dubai - United Arab Emirates'
 const businessEmail = 'fandttyres@gmail.com'
+const formSubmitEndpoint = `https://formsubmit.co/${businessEmail}`
+const formSubmitAjaxEndpoint = `https://formsubmit.co/ajax/${businessEmail}`
+const formSubmitWebhook = import.meta.env.VITE_FORMSUBMIT_WEBHOOK_URL?.trim() || ''
 const googleBusinessUrl = 'https://maps.app.goo.gl/KHyJ1AWd4SQjhiZS6'
 const googleMapsEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.4786034776644!2d55.213714499999995!3d25.116199400000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f69800acbeb4b%3A0x8e237ba522c88739!2sF%20%26%20T%20Auto%20Services.%20Tyres%20%7C%20Brakes%20%7C%20Mechanical%20%7C%20A%2FC%20%7C%20Wheel%20Alignment!5e1!3m2!1sen!2sin!4v1792744599835!5m2!1sen!2sin'
 
@@ -52,19 +55,45 @@ function App() {
   const [service, setService] = useState('Tyre replacement')
   const [category, setCategory] = useState('Sedan')
   const [tyres, setTyres] = useState('4')
-  const [leadSent, setLeadSent] = useState(false)
+  const [leadStatus, setLeadStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const estimate = useMemo(() => {
     const multiplier = category === 'Premium SUV' ? 2.8 : category === 'SUV / 4×4' ? 1.8 : 1
     const count = service === 'Tyre replacement' ? Number(tyres) : 1
     return Math.round((estimateBases[service] ?? 180) * multiplier * count)
   }, [category, service, tyres])
 
-  function submitLead(event: React.FormEvent<HTMLFormElement>) {
+  async function submitLead(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const text = `Hi F&T Auto Services, please call me about ${data.get('service')}. My name is ${data.get('name')} and my number is ${data.get('phone')}.`
-    setLeadSent(true)
-    window.open(`https://wa.me/971564771478?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
+    const form = event.currentTarget
+    const data = new FormData(form)
+
+    data.set('_subject', 'New website lead — F&T Auto Services')
+    data.set('_template', 'table')
+    data.set('_url', window.location.href)
+    data.set('page_url', window.location.href)
+    data.set('submitted_at', new Date().toISOString())
+    setLeadStatus('submitting')
+
+    try {
+      const response = await fetch(formSubmitAjaxEndpoint, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(data.entries())),
+      })
+      const result = await response.json().catch(() => ({})) as { success?: boolean | string; message?: string }
+
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || 'Unable to submit form')
+      }
+
+      form.reset()
+      setLeadStatus('success')
+    } catch {
+      setLeadStatus('error')
+    }
   }
 
   return <>
@@ -89,12 +118,23 @@ function App() {
             <div className="hero-actions"><a className="btn btn-lime" href={phoneLink}><Phone size={17} /> Call {phone}</a><a className="btn btn-glass" href={whatsapp} target="_blank" rel="noreferrer"><svg className="whatsapp-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.82 11.82 0 0 0 12.08 0C5.52 0 .18 5.34.18 11.9c0 2.1.55 4.16 1.6 5.97L.08 24l6.29-1.65a11.87 11.87 0 0 0 5.69 1.45h.01c6.56 0 11.9-5.34 11.9-11.9 0-3.18-1.24-6.17-3.45-8.42ZM12.07 21.78h-.01a9.86 9.86 0 0 1-5.02-1.37l-.36-.21-3.73.98 1-3.64-.24-.37a9.84 9.84 0 0 1-1.51-5.27c0-5.46 4.45-9.9 9.91-9.9 2.65 0 5.14 1.03 7.01 2.9a9.84 9.84 0 0 1 2.9 7.01c0 5.46-4.45 9.9-9.95 9.9Z"/><path fill="currentColor" d="M17.55 14.43c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37s-1.04 1.02-1.04 2.48 1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.09 4.49.71.31 1.27.5 1.7.64.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/></svg> WhatsApp us</a></div>
             <div className="proof-row"><span><Check size={15} /> Visit Our Workshop in Al Quoz 3</span><span><Check size={15} /> Genuine tyre brands</span><span><Check size={15} /> Upfront quotes</span></div>
           </div>
-          <form className="hero-form" id="callback" onSubmit={submitLead}>
+          <form className="hero-form" id="callback" action={formSubmitEndpoint} method="POST" onSubmit={submitLead}>
             <div className="form-kicker">NEED OUR HELP?</div><h2>Request a callback</h2><p>Tell us what you need. We’ll confirm your options and the next step for visiting our workshop.</p>
+            <input type="hidden" name="_subject" value="New website lead — F&T Auto Services" readOnly />
+            <input type="hidden" name="_template" value="table" readOnly />
+            <input type="hidden" name="_url" value={window.location.href} readOnly />
+            <input type="hidden" name="page_url" value={window.location.href} readOnly />
+            {formSubmitWebhook && <input type="hidden" name="_webhook" value={formSubmitWebhook} readOnly />}
+            <input className="form-honey" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <label>Your name<input required name="name" placeholder="e.g. Ahmed" autoComplete="name" /></label>
             <label>Phone number<input required name="phone" type="tel" placeholder="+971 5X XXX XXXX" autoComplete="tel" /></label>
+            <label>Email address<input required name="email" type="email" placeholder="you@example.com" autoComplete="email" /></label>
             <label>Service needed<select name="service"><option>Puncture repair</option><option>Tyre replacement</option><option>Battery testing & replacement</option><option>Wheel alignment</option><option>Brake service</option><option>Mechanical & engine repair</option><option>Car Denting Painting</option><option>Electrical Repair</option></select></label>
-            <button className="btn btn-dark form-submit" type="submit">{leadSent ? 'Send another request' : 'Request a callback'} <ArrowRight size={17} /></button>
+            <label>Vehicle details <span className="optional-label">Optional</span><input name="vehicle" placeholder="Make, model or tyre size" /></label>
+            <label>Message <span className="optional-label">Optional</span><textarea name="message" placeholder="Tell us about the issue or service you need" rows={3} /></label>
+            <button className="btn btn-dark form-submit" type="submit" disabled={leadStatus === 'submitting'}>{leadStatus === 'submitting' ? 'Sending request…' : leadStatus === 'success' ? 'Send another request' : 'Request a callback'} <ArrowRight size={17} /></button>
+            {leadStatus === 'success' && <p className="form-status success" role="status"><CheckCircle2 size={17} /> Thanks—your request has been received. We’ll call you shortly.</p>}
+            {leadStatus === 'error' && <p className="form-status error" role="alert"><AlertCircle size={17} /> We couldn’t send your request. Please call or WhatsApp us instead.</p>}
             <span className="form-note"><ShieldCheck size={14} /> No obligation. Your details stay private.</span>
           </form>
         </div>

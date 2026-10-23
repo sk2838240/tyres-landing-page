@@ -104,3 +104,13 @@ svg.lucide-phone{color:#E53935!important}
 .brand-logo{display:block;width:auto;height:48px;object-fit:contain}
 .footer-brand .brand-logo{height:44px}
 @media(max-width:680px){.brand-logo,.footer-brand .brand-logo{height:40px}}
+.form-submit:disabled{opacity:.65;cursor:wait;transform:none;box-shadow:none}
+.form-status{display:flex;align-items:flex-start;gap:8px;margin:12px 0 0;padding:10px 11px;border-radius:6px;font-size:11px;line-height:1.5}
+.form-status svg{flex:none;margin-top:1px}
+.form-status.success{background:#eef8e6;color:#3f641e}
+.form-status.error{background:#fff0f0;color:#9a2c2c}
+.form-honey{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.hero-form textarea{display:block;width:100%;min-height:78px;resize:vertical;border:1px solid #e2e2da;background:#fff;border-radius:4px;padding:10px 12px;margin-top:6px;outline:none;font:inherit;font-size:11px;color:#30332d}
+.hero-form textarea:focus{border-color:#8753A1;box-shadow:0 0 0 3px #CCA5CE55}
+.optional-label{color:#8a8c84;font-weight:500;margin-left:4px}
+@media(max-width:900px){.hero-form textarea{font-size:13px}}
