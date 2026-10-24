@@ -1,15 +1,14 @@
 const SPREADSHEET_ID = '1iZstxdRsgwne9x1WZVRPm2Xfa8foFkPcwW3FXSE5S44'
 const SHEET_NAME = 'Leads'
 const WEBHOOK_TOKEN = PropertiesService.getScriptProperties().getProperty('WEBHOOK_TOKEN') || ''
-const CANONICAL_HEADERS = ['Received at', 'Name', 'Phone', 'Email', 'Service', 'Vehicle', 'Message', 'Source URL', 'Submitted at']
+const CANONICAL_HEADERS = ['Received at', 'Name', 'Phone', 'Email', 'Service', 'Source URL', 'Submitted at']
+const REQUIRED_FIELDS = ['name', 'phone', 'email', 'service']
 const HEADER_FIELDS = {
   received_at: null,
   name: 'name',
   phone: 'phone',
   email: 'email',
   service: 'service',
-  vehicle: 'vehicle',
-  message: 'message',
   source_url: 'page_url',
   submitted_at: 'submitted_at',
 }
@@ -28,6 +27,25 @@ function doPost(e) {
     }
 
     const data = payload.form_data || payload
+
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      return jsonResponse({ success: false, error: 'Invalid request body' })
+    }
+
+    if (String(data._honey || '').trim()) {
+      return jsonResponse({ success: true })
+    }
+
+    const missingFields = REQUIRED_FIELDS.filter((field) => !String(data[field] || '').trim())
+
+    if (missingFields.length > 0) {
+      return jsonResponse({ success: false, error: `Missing required fields: ${missingFields.join(', ')}` })
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email).trim())) {
+      return jsonResponse({ success: false, error: 'Invalid email address' })
+    }
+
     const lock = LockService.getScriptLock()
     lock.waitLock(10000)
 
@@ -38,7 +56,7 @@ function doPost(e) {
         throw new Error('Sheet tab not found')
       }
 
-      const headers = ensureHeaders(sheet, getHeaders(data))
+      const headers = ensureHeaders(sheet, CANONICAL_HEADERS)
       const row = headers.map((header) => normalizeHeader(header) === 'received_at' ? new Date() : getValue(header, data))
       sheet.appendRow(row)
 
@@ -60,15 +78,6 @@ function doGet(e) {
   }
 
   return jsonResponse({ success: true, message: 'Lead collection endpoint is reachable' })
-}
-
-function getHeaders(data) {
-  const knownFields = Object.values(HEADER_FIELDS).filter(Boolean)
-  const additionalFields = Object.keys(data)
-    .filter((field) => !field.startsWith('_') && !knownFields.includes(field))
-    .sort()
-
-  return [...CANONICAL_HEADERS, ...additionalFields]
 }
 
 function ensureHeaders(sheet, requiredHeaders) {

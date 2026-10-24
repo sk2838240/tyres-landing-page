@@ -66,31 +66,58 @@ function App() {
     event.preventDefault()
     const form = event.currentTarget
     const data = new FormData(form)
-
-    data.set('_subject', 'New website lead — F&T Auto Services')
-    data.set('_template', 'table')
-    data.set('_url', window.location.href)
-    data.set('page_url', window.location.href)
-    data.set('submitted_at', new Date().toISOString())
+    const payload = {
+      _subject: 'New website lead — F&T Auto Services',
+      _template: 'table',
+      _url: window.location.href,
+      _honey: String(data.get('_honey') ?? ''),
+      name: String(data.get('name') ?? '').trim(),
+      phone: String(data.get('phone') ?? '').trim(),
+      email: String(data.get('email') ?? '').trim(),
+      service: String(data.get('service') ?? '').trim(),
+      page_url: window.location.href,
+      submitted_at: new Date().toISOString(),
+    }
     setLeadStatus('submitting')
 
+    if (!formSubmitWebhook) {
+      setLeadStatus('error')
+      return
+    }
+    const emailRequest = fetch(formSubmitAjaxEndpoint, {
+      method: 'POST',
+      keepalive: true,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }).then(async (response) => {
+      const result = await response.json().catch(() => ({})) as { success?: boolean | string; message?: string }
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || 'Unable to submit form')
+      }
+    }).catch((error: unknown) => {
+      console.error('FormSubmit email delivery failed', error)
+    })
+
     try {
-      const response = await fetch(formSubmitAjaxEndpoint, {
+      const response = await fetch(formSubmitWebhook, {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          'Content-Type': 'text/plain;charset=UTF-8',
         },
-        body: JSON.stringify(Object.fromEntries(data.entries())),
+        body: JSON.stringify({ form_data: payload }),
       })
       const result = await response.json().catch(() => ({})) as { success?: boolean | string; message?: string }
 
       if (!response.ok || result.success === false) {
-        throw new Error(result.message || 'Unable to submit form')
+        throw new Error(result.message || 'Unable to save lead')
       }
 
       form.reset()
       setLeadStatus('success')
+      void emailRequest
     } catch {
       setLeadStatus('error')
     }
@@ -119,19 +146,18 @@ function App() {
             <div className="proof-row"><span><Check size={15} /> Visit Our Workshop in Al Quoz 3</span><span><Check size={15} /> Genuine tyre brands</span><span><Check size={15} /> Upfront quotes</span></div>
           </div>
           <form className="hero-form" id="callback" action={formSubmitEndpoint} method="POST" onSubmit={submitLead}>
-            <div className="form-kicker">NEED OUR HELP?</div><h2>Request a callback</h2><p>Tell us what you need. We’ll confirm your options and the next step for visiting our workshop.</p>
+            <div className="form-kicker">NEED OUR HELP?</div><h2>Request a callback</h2><p>Tell us what you need and we’ll confirm the next step.</p>
             <input type="hidden" name="_subject" value="New website lead — F&T Auto Services" readOnly />
             <input type="hidden" name="_template" value="table" readOnly />
             <input type="hidden" name="_url" value={window.location.href} readOnly />
             <input type="hidden" name="page_url" value={window.location.href} readOnly />
-            {formSubmitWebhook && <input type="hidden" name="_webhook" value={formSubmitWebhook} readOnly />}
             <input className="form-honey" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-            <label>Your name<input required name="name" placeholder="e.g. Ahmed" autoComplete="name" /></label>
-            <label>Phone number<input required name="phone" type="tel" placeholder="+971 5X XXX XXXX" autoComplete="tel" /></label>
-            <label>Email address<input required name="email" type="email" placeholder="you@example.com" autoComplete="email" /></label>
-            <label>Service needed<select name="service"><option>Puncture repair</option><option>Tyre replacement</option><option>Battery testing & replacement</option><option>Wheel alignment</option><option>Brake service</option><option>Mechanical & engine repair</option><option>Car Denting Painting</option><option>Electrical Repair</option></select></label>
-            <label>Vehicle details <span className="optional-label">Optional</span><input name="vehicle" placeholder="Make, model or tyre size" /></label>
-            <label>Message <span className="optional-label">Optional</span><textarea name="message" placeholder="Tell us about the issue or service you need" rows={3} /></label>
+            <div className="form-grid">
+              <label>Your name<input required name="name" placeholder="e.g. Ahmed" autoComplete="name" /></label>
+              <label>Phone number<input required name="phone" type="tel" placeholder="+971 5X XXX XXXX" autoComplete="tel" /></label>
+              <label>Email address<input required name="email" type="email" placeholder="you@example.com" autoComplete="email" /></label>
+              <label>Service needed<select required name="service"><option value="">Select a service</option><option>Puncture repair</option><option>Tyre replacement</option><option>Battery testing & replacement</option><option>Wheel alignment</option><option>Brake service</option><option>Mechanical & engine repair</option><option>Car Denting Painting</option><option>Electrical Repair</option></select></label>
+            </div>
             <button className="btn btn-dark form-submit" type="submit" disabled={leadStatus === 'submitting'}>{leadStatus === 'submitting' ? 'Sending request…' : leadStatus === 'success' ? 'Send another request' : 'Request a callback'} <ArrowRight size={17} /></button>
             {leadStatus === 'success' && <p className="form-status success" role="status"><CheckCircle2 size={17} /> Thanks—your request has been received. We’ll call you shortly.</p>}
             {leadStatus === 'error' && <p className="form-status error" role="alert"><AlertCircle size={17} /> We couldn’t send your request. Please call or WhatsApp us instead.</p>}
