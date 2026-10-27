@@ -122,6 +122,8 @@ function App() {
 
       <section className="trust-strip"><div><strong>12+</strong><span>Premium Tyre Brands</span></div><i /><div><strong>Full-Service</strong><span>Auto Repair Workshop</span></div><i /><div><strong>Expert Technicians</strong><span>Skilled Vehicle Care</span></div><i /><div><strong>Al Quoz 3</strong><span>Convenient Location</span></div></section>
 
+      <div className="tf-divider" aria-hidden="true" />
+
       <TyreFinder />
 
       <section className="section services-section" id="services"><div className="section-heading"><div><span className="eyebrow dark-eyebrow">WHAT WE CAN DO FOR YOU</span><h2>Top requested <em>services</em></h2></div><p>From tyre fitting and puncture repairs to scheduled maintenance, our Al Quoz 3 workshop looks after your vehicle.</p></div>
