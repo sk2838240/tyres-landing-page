@@ -1,17 +1,9 @@
 import { useMemo, useState } from 'react'
 import { AlertCircle, ArrowRight, Battery, Check, CheckCircle2, ChevronDown, Clock3, Disc3, Gauge, MapPin, Menu, MessageCircle, Phone, ShieldCheck, Star, Wrench, X } from 'lucide-react'
 import './App.css'
-
-const phone = '+971 56 477 1478'
-const phoneLink = 'tel:+971564771478'
-const whatsapp = 'https://wa.me/971564771478?text=Hi%20F%26T%20Auto%20Services%2C%20I%20need%20tyre%20or%20car%20repair%20assistance.'
-const businessAddress = '3 Umm Suqeim St - Al Qouz Ind.third - Al Quoz - Dubai - United Arab Emirates'
-const businessEmail = 'fandttyres@gmail.com'
-const formSubmitEndpoint = `https://formsubmit.co/${businessEmail}`
-const formSubmitAjaxEndpoint = `https://formsubmit.co/ajax/${businessEmail}`
-const formSubmitWebhook = import.meta.env.VITE_FORMSUBMIT_WEBHOOK_URL?.trim() || ''
-const googleBusinessUrl = 'https://maps.app.goo.gl/KHyJ1AWd4SQjhiZS6'
-const googleMapsEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.4786034776644!2d55.213714499999995!3d25.116199400000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f69800acbeb4b%3A0x8e237ba522c88739!2sF%20%26%20T%20Auto%20Services.%20Tyres%20%7C%20Brakes%20%7C%20Mechanical%20%7C%20A%2FC%20%7C%20Wheel%20Alignment!5e1!3m2!1sen!2sin!4v1792744599835!5m2!1sen!2sin'
+import TyreFinder from './sections/TyreFinder'
+import { buildLeadPayload, submitLead as sendLead } from './lib/lead'
+import { businessAddress, businessEmail, formSubmitEndpoint, googleBusinessUrl, googleMapsEmbedUrl, phone, phoneLink, whatsapp } from './lib/site'
 
 const services = [
   { icon: Wrench, title: 'Car Denting Painting', text: 'Professional denting, panel repair and painting for a smooth, factory-style finish.' },
@@ -66,58 +58,20 @@ function App() {
     event.preventDefault()
     const form = event.currentTarget
     const data = new FormData(form)
-    const payload = {
-      _subject: 'New website lead — F&T Auto Services',
-      _template: 'table',
-      _url: window.location.href,
+    const payload = buildLeadPayload({
       _honey: String(data.get('_honey') ?? ''),
       name: String(data.get('name') ?? '').trim(),
       phone: String(data.get('phone') ?? '').trim(),
       email: String(data.get('email') ?? '').trim(),
       service: String(data.get('service') ?? '').trim(),
-      page_url: window.location.href,
-      submitted_at: new Date().toISOString(),
-    }
+      lead_source: 'Callback form',
+    })
     setLeadStatus('submitting')
 
-    if (!formSubmitWebhook) {
-      setLeadStatus('error')
-      return
-    }
-    const emailRequest = fetch(formSubmitAjaxEndpoint, {
-      method: 'POST',
-      keepalive: true,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    }).then(async (response) => {
-      const result = await response.json().catch(() => ({})) as { success?: boolean | string; message?: string }
-      if (!response.ok || result.success === false) {
-        throw new Error(result.message || 'Unable to submit form')
-      }
-    }).catch((error: unknown) => {
-      console.error('FormSubmit email delivery failed', error)
-    })
-
     try {
-      const response = await fetch(formSubmitWebhook, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=UTF-8',
-        },
-        body: JSON.stringify({ form_data: payload }),
-      })
-      const result = await response.json().catch(() => ({})) as { success?: boolean | string; message?: string }
-
-      if (!response.ok || result.success === false) {
-        throw new Error(result.message || 'Unable to save lead')
-      }
-
+      await sendLead(payload)
       form.reset()
       setLeadStatus('success')
-      void emailRequest
     } catch {
       setLeadStatus('error')
     }
@@ -129,7 +83,7 @@ function App() {
       <a className="brand" href="#home" aria-label="F and T Auto Services home"><img className="brand-logo" src="/images/logos/ftlogonew.webp" alt="F&T Auto Services" /></a>
       <button className="mobile-toggle" aria-label="Toggle navigation" onClick={() => setMobileOpen(!mobileOpen)}>{mobileOpen ? <X /> : <Menu />}</button>
       <nav className={mobileOpen ? 'nav-links open' : 'nav-links'}>
-        <a onClick={() => setMobileOpen(false)} href="#services">Services</a><a onClick={() => setMobileOpen(false)} href="#tyres">Tyres & prices</a><a onClick={() => setMobileOpen(false)} href="#vehicles">By vehicle</a><a onClick={() => setMobileOpen(false)} href="#workshop">Workshop</a><a onClick={() => setMobileOpen(false)} href="#faq">FAQs</a>
+        <a onClick={() => setMobileOpen(false)} href="#services">Services</a><a onClick={() => setMobileOpen(false)} href="#tyre-finder">Find tyre size</a><a onClick={() => setMobileOpen(false)} href="#tyres">Tyres & prices</a><a onClick={() => setMobileOpen(false)} href="#vehicles">By vehicle</a><a onClick={() => setMobileOpen(false)} href="#workshop">Workshop</a><a onClick={() => setMobileOpen(false)} href="#faq">FAQs</a>
         <a className="nav-call" href={phoneLink}><Phone size={15} /> Call now</a>
       </nav>
     </header>
@@ -167,6 +121,8 @@ function App() {
       </section>
 
       <section className="trust-strip"><div><strong>12+</strong><span>Premium Tyre Brands</span></div><i /><div><strong>Full-Service</strong><span>Auto Repair Workshop</span></div><i /><div><strong>Expert Technicians</strong><span>Skilled Vehicle Care</span></div><i /><div><strong>Al Quoz 3</strong><span>Convenient Location</span></div></section>
+
+      <TyreFinder />
 
       <section className="section services-section" id="services"><div className="section-heading"><div><span className="eyebrow dark-eyebrow">WHAT WE CAN DO FOR YOU</span><h2>Top requested <em>services</em></h2></div><p>From tyre fitting and puncture repairs to scheduled maintenance, our Al Quoz 3 workshop looks after your vehicle.</p></div>
         <div className="service-grid">{services.map(({ icon: Icon, title, text }, i) => <article className="service-card" key={title}><div className="service-icon"><Icon size={22} /></div><span className="service-index">0{i + 1}</span><h3>{title}</h3><p>{text}</p><a href={whatsapp} target="_blank" rel="noreferrer" aria-label={`Ask about ${title}`}><ArrowRight size={17} /></a></article>)}</div>

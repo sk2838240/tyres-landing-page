@@ -1,7 +1,7 @@
 const SPREADSHEET_ID = '1iZstxdRsgwne9x1WZVRPm2Xfa8foFkPcwW3FXSE5S44'
 const SHEET_NAME = 'Leads'
 const WEBHOOK_TOKEN = PropertiesService.getScriptProperties().getProperty('WEBHOOK_TOKEN') || ''
-const CANONICAL_HEADERS = ['Received at', 'Name', 'Phone', 'Email', 'Service', 'Source URL', 'Submitted at']
+const CANONICAL_HEADERS = ['Received at', 'Name', 'Phone', 'Email', 'Service', 'Source URL', 'Submitted at', 'Tyre size', 'Tyres needed', 'Notes', 'Lead source']
 const REQUIRED_FIELDS = ['name', 'phone', 'email', 'service']
 const HEADER_FIELDS = {
   received_at: null,
@@ -11,6 +11,10 @@ const HEADER_FIELDS = {
   service: 'service',
   source_url: 'page_url',
   submitted_at: 'submitted_at',
+  tyre_size: 'tyre_size',
+  tyre_qty: 'tyre_qty',
+  notes: 'notes',
+  lead_source: 'lead_source',
 }
 
 function doPost(e) {

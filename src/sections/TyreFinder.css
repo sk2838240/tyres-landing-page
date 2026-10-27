@@ -1,0 +1,140 @@
+/* Tyre size finder section — F&T purple identity.
+   All classes are prefixed tf- so they cannot collide with App.css. */
+
+.tf-section{padding-top:96px;padding-bottom:96px}
+
+.tf-layout{display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:56px;align-items:start}
+
+.tf-copy{max-width:520px}
+.tf-copy h2{margin:14px 0 18px}
+.tf-copy>p{color:#5d5a63;font-size:14px;line-height:1.85;margin:0 0 24px}
+.tf-points{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:14px}
+.tf-points li{display:flex;gap:12px;align-items:flex-start;color:#5d5a63;font-size:13px;line-height:1.7}
+.tf-points svg{flex:none;margin-top:4px;color:#724298}
+.tf-points strong{display:block;color:#111111;font-weight:800;font-size:13px;margin-bottom:2px}
+.tf-fineprint{font-size:11px!important;color:#8a8792!important;line-height:1.7!important;margin:0!important;padding-top:20px;border-top:1px solid var(--line)}
+
+/* Card */
+.tf-card{background:#ffffff;border:1px solid var(--line);border-radius:8px;padding:24px 24px 22px;box-shadow:0 18px 40px rgba(17,17,17,.08)}
+.tf-card-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.tf-card-kicker{font:800 10px/1 Manrope,sans-serif;letter-spacing:.17em;color:#724298}
+.tf-help-toggle{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0;font-size:11px;font-weight:700;color:#8753A1;cursor:pointer}
+.tf-help-toggle:hover{color:#5D318D}
+.tf-help-toggle svg{color:#8753A1}
+.tf-help{background:#f7f3f9;border:1px solid #e3d9e8;border-radius:6px;padding:16px;margin-bottom:14px}
+.tf-help-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center}
+.tf-help-grid>div{display:flex;flex-direction:column;align-items:center;gap:3px}
+.tf-help-grid span{width:22px;height:22px;border-radius:50%;background:#724298;color:#fff;font:800 11px/22px Manrope,sans-serif}
+.tf-help-grid strong{font-size:11px;color:#111111}
+.tf-help-grid small{font-size:10px;color:#6f6b76}
+.tf-help-example{font-size:11px;color:#5d5a63;margin:14px 0 0;text-align:center}
+.tf-help-example strong{color:#111111}
+
+.tf-sr-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Steps */
+.tf-steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 14px;padding:0}
+.tf-step{width:100%;display:flex;align-items:center;gap:9px;background:#fafafa;border:1px solid var(--line);border-radius:6px;padding:9px 10px;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s,background .2s}
+.tf-step:disabled{cursor:not-allowed;background:#f4f4f4;opacity:.6}
+.tf-step-index{width:22px;height:22px;flex:none;border-radius:50%;background:#e6e6e6;color:#5f5f5f;font:800 11px/1 Manrope,sans-serif;text-align:center;display:flex;align-items:center;justify-content:center}
+.tf-step-text{display:flex;flex-direction:column;min-width:0}
+.tf-step-text small{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#85828c;font-weight:700}
+.tf-step-text strong{font-size:13px;color:#111111;font-weight:800;line-height:1.2}
+.tf-step.complete .tf-step-index{background:#724298;color:#fff}
+.tf-step.active{border-color:#8753A1;background:#fff;animation:tf-pulse 2s infinite}
+.tf-step.active .tf-step-index{background:#724298;color:#fff}
+.tf-step.active .tf-step-text strong{color:#5D318D}
+
+@keyframes tf-pulse{0%,100%{box-shadow:0 0 0 0 rgba(135,83,161,.35)}50%{box-shadow:0 0 0 6px rgba(135,83,161,0)}}
+
+/* Option panel */
+.tf-panel{background:#f7f7f7;border:1px solid var(--line);border-radius:6px;padding:16px}
+.tf-panel-hint{font-size:11px;color:#6f6b76;margin:0 0 12px}
+.tf-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px;max-height:216px;overflow-y:auto;padding-right:2px}
+.tf-option{position:relative;display:block}
+.tf-option input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.tf-option span{display:flex;align-items:center;justify-content:center;height:40px;background:#fff;border:1px solid var(--line);border-radius:4px;font:800 13px Manrope,sans-serif;color:#111111;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+.tf-option:hover span{border-color:#8753A1;color:#5D318D}
+.tf-option input:focus-visible+span{outline:2px solid #8753A1;outline-offset:2px}
+.tf-option input:checked+span{border-color:#724298;background:#f2ebf6;color:#5D318D}
+
+.tf-ready{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.tf-current{display:flex;flex-direction:column;gap:2px}
+.tf-current span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#85828c;font-weight:700}
+.tf-current strong{font:800 20px Manrope,sans-serif;color:#5D318D;letter-spacing:-.02em}
+.tf-next{min-height:44px;white-space:nowrap}
+
+.tf-escape{display:block;margin:16px auto 0;background:none;border:0;padding:0;font-size:11px;font-weight:700;color:#8753A1;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.tf-escape:hover{color:#5D318D}
+.tf-escape.inline{display:inline-block;margin:0}
+
+/* Manual entry */
+.tf-manual{background:#f7f3f9;border:1px solid #e3d9e8;border-radius:6px;padding:16px}
+.tf-manual-actions{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.tf-manual-actions .btn{min-height:44px}
+.tf-field-note{font-size:10px;color:#8a8792;margin:8px 0 0}
+
+/* Lead form */
+.tf-lead{border-top:1px solid var(--line);padding-top:16px}
+.tf-lead-head{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#f7f3f9;border:1px solid #e3d9e8;border-radius:6px;padding:12px 14px;margin-bottom:16px}
+.tf-lead-head>div{display:flex;flex-direction:column;gap:2px}
+.tf-lead-head span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#85828c;font-weight:700}
+.tf-lead-head strong{font:800 19px Manrope,sans-serif;color:#5D318D}
+.tf-change{background:none;border:0;padding:0;font-size:11px;font-weight:700;color:#8753A1;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.tf-change:hover{color:#5D318D}
+
+.tf-fieldset{border:0;margin:0 0 14px;padding:0}
+.tf-fieldset legend{font-size:11px;font-weight:700;color:#4c4a52;margin-bottom:8px;padding:0}
+.tf-quantity{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tf-quantity-option{position:relative;display:block}
+.tf-quantity-option input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.tf-quantity-option span{display:flex;align-items:center;justify-content:center;height:40px;background:#fff;border:1px solid var(--line);border-radius:4px;font-size:12px;font-weight:700;color:#3f3d45;cursor:pointer}
+.tf-quantity-option input:focus-visible+span{outline:2px solid #8753A1;outline-offset:2px}
+.tf-quantity-option input:checked+span{border-color:#724298;background:#f2ebf6;color:#5D318D}
+
+.tf-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tf-field{display:block}
+.tf-field.full{grid-column:1/-1}
+.tf-field>span{display:block;font-size:11px;font-weight:700;color:#4c4a52;margin-bottom:5px}
+.tf-field>span small{font-weight:500;color:#8a8792}
+.tf-field input,.tf-field textarea{width:100%;box-sizing:border-box;height:44px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;padding:0 12px;font:inherit;font-size:13px;color:#20231f;outline:none}
+.tf-field textarea{height:auto;min-height:74px;padding:10px 12px;resize:vertical}
+.tf-field input:focus,.tf-field textarea:focus{border-color:#8753A1;box-shadow:0 0 0 3px #CCA5CE55}
+.tf-submit{width:100%;margin-top:16px;min-height:48px}
+.tf-lead .form-note{justify-content:flex-start}
+
+/* Success */
+.tf-success{text-align:center;padding:10px 0 4px}
+.tf-success-icon{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#eef8e6;color:#3f641e}
+.tf-success h3{font:800 21px Manrope,sans-serif;margin:14px 0 8px;color:#111111}
+.tf-success p{font-size:13px;line-height:1.75;color:#5d5a63;margin:0 0 18px}
+.tf-success p strong{color:#5D318D}
+.tf-success-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.tf-success-actions .btn{min-height:44px}
+.btn-glass-dark{background:#fff;color:#5D318D;border:1px solid #724298}
+.btn-glass-dark:hover{background:#f2ebf6}
+
+@media(max-width:1080px){
+  .tf-layout{grid-template-columns:1fr;gap:34px}
+  .tf-copy{max-width:none}
+}
+
+@media(max-width:680px){
+  .tf-section{padding-top:64px;padding-bottom:64px}
+  .tf-card{padding:18px 16px}
+  .tf-card-head{flex-direction:column;align-items:flex-start;gap:8px}
+  .tf-help-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+  .tf-steps{gap:6px}
+  .tf-step{flex-direction:column;align-items:flex-start;gap:6px;padding:9px}
+  .tf-options{grid-template-columns:repeat(auto-fill,minmax(66px,1fr));max-height:200px}
+  .tf-ready{flex-direction:column;align-items:stretch}
+  .tf-next{width:100%}
+  .tf-form-grid{grid-template-columns:1fr}
+  .tf-field.full{grid-column:auto}
+  .tf-success-actions{flex-direction:column}
+  .tf-success-actions .btn{width:100%}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .tf-step.active{animation:none}
+}

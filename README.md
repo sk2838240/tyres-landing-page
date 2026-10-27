@@ -9,8 +9,25 @@ Single-page marketing site for F&T Auto Services (Al Quoz 3, Dubai tyre shop and
 - `npm run lint` — run ESLint
 - `npm run preview` — serve the production build
 
-## Brand asset credits
+## Tyre size finder
 
+`src/sections/TyreFinder.tsx` renders the "Find your tyre size" section (mounted in `App.tsx` between the trust strip and the services section). It is a three-step picker — **Width → Aspect ratio → Rim size** — that prunes each step to the combinations that actually exist, then hands the selected size to a lead form instead of a results page.
+
+- `src/data/tyreSizes.ts` holds the catalogue of valid combinations and the derivation helpers (`heightsForWidth`, `rimsFor`, `formatSize`, `parseSize`).
+- `src/lib/lead.ts` sends every lead to both destinations: a formsubmit.co email notification (fire and forget) and the Google Sheets webhook (the source of truth).
+- The lead payload carries `tyre_size`, `tyre_qty`, `notes` and `lead_source` alongside the usual contact fields. `service` is always sent as `Tyre replacement`.
+
+### Maintaining the tyre size catalogue
+
+Edit the `CATALOGUE` array in `src/data/tyreSizes.ts`. Only valid, orderable combinations belong in the list — remove anything you cannot supply. Customers whose size is missing can still use the "My size isn't listed" escape hatch, so the catalogue never has to block a lead.
+
+## Lead capture endpoints
+
+`VITE_FORMSUBMIT_WEBHOOK_URL` points at a Google Apps Script web app (`google-sheets-lead-webhook.gs`) that appends a row to the "Leads" sheet. The sheet columns are created automatically on the first write after the script is deployed.
+
+**After changing `google-sheets-lead-webhook.gs` you must redeploy it:** open the Apps Script project, paste the updated file, then use **Deploy → Manage deployments → edit → Version: New version → Deploy**. Until that happens the running script keeps the old column set and new fields are not written.
+
+## Brand asset credits
 Vehicle manufacturer marks in `public/images/logos/` are sourced from Wikimedia Commons and keep their original brand colours:
 
 - Mercedes-Benz star — `File:Mercedes-Benz Star.svg` (public domain, Mercedes-Benz)
