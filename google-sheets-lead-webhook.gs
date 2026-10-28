@@ -2,7 +2,7 @@ const SPREADSHEET_ID = '1iZstxdRsgwne9x1WZVRPm2Xfa8foFkPcwW3FXSE5S44'
 const SHEET_NAME = 'Leads'
 const WEBHOOK_TOKEN = PropertiesService.getScriptProperties().getProperty('WEBHOOK_TOKEN') || ''
 const CANONICAL_HEADERS = ['Received at', 'Name', 'Phone', 'Email', 'Service', 'Source URL', 'Submitted at', 'Tyre size', 'Tyres needed', 'Notes', 'Lead source']
-const REQUIRED_FIELDS = ['name', 'phone', 'email', 'service']
+const REQUIRED_FIELDS = ['name', 'phone', 'service']
 const HEADER_FIELDS = {
   received_at: null,
   name: 'name',
@@ -46,7 +46,9 @@ function doPost(e) {
       return jsonResponse({ success: false, error: `Missing required fields: ${missingFields.join(', ')}` })
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email).trim())) {
+    const email = String(data.email || '').trim()
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return jsonResponse({ success: false, error: 'Invalid email address' })
     }
 

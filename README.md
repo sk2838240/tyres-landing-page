@@ -25,6 +25,8 @@ Edit the `CATALOGUE` array in `src/data/tyreSizes.ts`. Only valid, orderable com
 
 `VITE_FORMSUBMIT_WEBHOOK_URL` points at a Google Apps Script web app (`google-sheets-lead-webhook.gs`) that appends a row to the "Leads" sheet. The sheet columns are created automatically on the first write after the script is deployed.
 
+Required fields are **name, phone and service**. Email is optional — when it is supplied it is still format-checked, so a lead can be captured from a phone-only enquiry.
+
 **After changing `google-sheets-lead-webhook.gs` you must redeploy it:** open the Apps Script project, paste the updated file, then use **Deploy → Manage deployments → edit → Version: New version → Deploy**. Until that happens the running script keeps the old column set and new fields are not written.
 
 ## Brand asset credits
