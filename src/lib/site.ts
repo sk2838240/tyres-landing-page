@@ -1,6 +1,10 @@
 export const phone = '+971 56 477 1478'
 export const phoneLink = 'tel:+971564771478'
-export const whatsapp = 'https://wa.me/971564771478?text=Hi%20F%26T%20Auto%20Services%2C%20I%20need%20tyre%20or%20car%20repair%20assistance.'
+const whatsappBase = 'https://wa.me/971564771478'
+export const whatsapp = `${whatsappBase}?text=Hi%20F%26T%20Auto%20Services%2C%20I%20need%20tyre%20or%20car%20repair%20assistance.`
+export function whatsappLink(message: string): string {
+  return `${whatsappBase}?text=${encodeURIComponent(message)}`
+}
 export const businessAddress = '3 Umm Suqeim St - Al Qouz Ind.third - Al Quoz - Dubai - United Arab Emirates'
 export const businessEmail = 'fandttyres@gmail.com'
 export const formSubmitEndpoint = `https://formsubmit.co/${businessEmail}`

@@ -11,17 +11,19 @@ Single-page marketing site for F&T Auto Services (Al Quoz 3, Dubai tyre shop and
 
 ## Tyre size finder
 
-`src/sections/TyreFinder.tsx` renders the "Find your tyre size" section (mounted in `App.tsx` between the trust strip and the services section). It is a three-step picker — **Width → Aspect ratio → Rim size** — that prunes each step to the combinations that actually exist, then hands the selected size to a lead form instead of a results page.
+`src/sections/TyreFinder.tsx` renders the "Find your tyre size" section (mounted in `App.tsx` between the trust strip and the services section). It is a three-step picker — **Width → Aspect ratio → Rim size** — that prunes each step to the combinations that actually exist. The funnel collects no form data: once a size is chosen (or typed manually), the "Get my quote" button opens WhatsApp in a new tab with the size and quantity pre-filled in the message, so the enquiry arrives as a direct chat.
 
 - `src/data/tyreSizes.ts` holds the catalogue of valid combinations and the derivation helpers (`heightsForWidth`, `rimsFor`, `formatSize`, `parseSize`).
-- `src/lib/lead.ts` sends every lead to both destinations: a formsubmit.co email notification (fire and forget) and the Google Sheets webhook (the source of truth).
-- The lead payload carries `tyre_size`, `tyre_qty`, `notes` and `lead_source` alongside the usual contact fields. `service` is always sent as `Tyre replacement`.
+- `src/lib/site.ts` exposes `whatsappLink(message)` for building a WhatsApp URL with a custom pre-filled text. The finder message reads `Hi F&T Auto Services, I need {qty} of size {size}. Please advise availability and a fitted quote.`
+- The manual "My size isn't listed" escape hatch sends the size exactly as the customer typed it, even if it is not a standard combination.
 
 ### Maintaining the tyre size catalogue
 
 Edit the `CATALOGUE` array in `src/data/tyreSizes.ts`. Only valid, orderable combinations belong in the list — remove anything you cannot supply. Customers whose size is missing can still use the "My size isn't listed" escape hatch, so the catalogue never has to block a lead.
 
 ## Lead capture endpoints
+
+Only the hero callback form submits lead data. The tyre size finder does not — it hands the customer to WhatsApp.
 
 `VITE_FORMSUBMIT_WEBHOOK_URL` points at a Google Apps Script web app (`google-sheets-lead-webhook.gs`) that appends a row to the "Leads" sheet. The sheet columns are created automatically on the first write after the script is deployed.
 

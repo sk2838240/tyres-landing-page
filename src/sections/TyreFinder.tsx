@@ -1,13 +1,10 @@
-import { useMemo, useRef, useState } from 'react'
-import { AlertCircle, ArrowRight, Check, CheckCircle2, Info, MessageCircle, Phone, ShieldCheck } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { ArrowRight, Check, Info, MessageCircle } from 'lucide-react'
 import { formatSize, heightsForWidth, parseSize, rimsFor, TYRE_WIDTHS, type TyreSize } from '../data/tyreSizes'
-import { buildLeadPayload, submitLead } from '../lib/lead'
-import { phone, phoneLink, whatsapp } from '../lib/site'
+import { whatsappLink } from '../lib/site'
 import './TyreFinder.css'
 
 type Step = 1 | 2 | 3
-type Phase = 'sizes' | 'lead' | 'success'
-type LeadStatus = 'idle' | 'submitting' | 'success' | 'error'
 
 const STEP_LABELS: Record<Step, string> = {
   1: 'Width',
@@ -35,10 +32,8 @@ export default function TyreFinder() {
   const [manualMode, setManualMode] = useState(false)
   const [manualSize, setManualSize] = useState('')
   const [showHelp, setShowHelp] = useState(false)
-  const [phase, setPhase] = useState<Phase>('sizes')
-  const [status, setStatus] = useState<LeadStatus>('idle')
   const [qty, setQty] = useState('4')
-  const formRef = useRef<HTMLFormElement>(null)
+  const [handoff, setHandoff] = useState(false)
 
   const heightOptions = useMemo(() => (width === null ? [] : heightsForWidth(width)), [width])
   const rimOptions = useMemo(() => (width === null || height === null ? [] : rimsFor(width, height)), [width, height])
@@ -47,6 +42,11 @@ export default function TyreFinder() {
     width !== null && height !== null && rim !== null ? { width, height, rim } : null
   const sizeLabel = manualMode ? manualSize.trim() : selectedSize ? formatSize(selectedSize) : ''
   const sizeReady = manualMode ? manualSize.trim().length > 0 : selectedSize !== null
+
+  const quantityLabel = qty === '1' ? '1 tyre' : `${qty} tyres`
+  const quoteHref = whatsappLink(
+    `Hi F&T Auto Services, I need ${quantityLabel} of size ${sizeLabel}. Please advise availability and a fitted quote.`,
+  )
 
   function chooseWidth(next: number) {
     setWidth(next)
@@ -82,60 +82,18 @@ export default function TyreFinder() {
   function startManual() {
     setManualMode(true)
     setShowHelp(false)
+    setHandoff(false)
   }
 
   function useSizePicker() {
     setManualMode(false)
     setManualSize('')
-    setPhase('sizes')
+    setHandoff(false)
   }
 
-  function openLeadForm() {
-    if (!sizeReady) return
-    setPhase('lead')
-    setStatus('idle')
-  }
-
-  function backToSizes() {
-    setPhase('sizes')
-    setStatus('idle')
-    setActiveStep(3)
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const form = event.currentTarget
-    const data = new FormData(form)
-
-    const payload = buildLeadPayload({
-      _honey: String(data.get('_honey') ?? ''),
-      name: String(data.get('name') ?? '').trim(),
-      phone: String(data.get('phone') ?? '').trim(),
-      email: String(data.get('email') ?? '').trim(),
-      service: 'Tyre replacement',
-      tyre_size: sizeLabel,
-      tyre_qty: qty,
-      notes: String(data.get('notes') ?? '').trim(),
-      lead_source: 'Tyre finder',
-    })
-
-    setStatus('submitting')
-    try {
-      await submitLead(payload)
-      form.reset()
-      setStatus('success')
-      setPhase('success')
-    } catch {
-      setStatus('error')
-    }
-  }
-
-  const statusMessage =
-    phase === 'sizes'
-      ? `Step ${activeStep} of 3: choose ${STEP_LABELS[activeStep].toLowerCase()}.`
-      : phase === 'lead'
-        ? `Step 4 of 4: confirm your details for tyre size ${sizeLabel}.`
-        : `Lead submitted for tyre size ${sizeLabel}.`
+  const statusMessage = sizeReady
+    ? `Tyre size ${sizeLabel} selected for ${quantityLabel}. Activate Get my quote to continue on WhatsApp.`
+    : `Step ${activeStep} of 3: choose ${STEP_LABELS[activeStep].toLowerCase()}.`
 
   return (
     <section className="section tf-section" id="tyre-finder">
@@ -224,7 +182,7 @@ export default function TyreFinder() {
             {statusMessage}
           </p>
 
-          {phase === 'sizes' && !manualMode && (
+          {!manualMode && (
             <>
               <ol className="tf-steps">
                 {([1, 2, 3] as Step[]).map((step) => {
@@ -305,18 +263,6 @@ export default function TyreFinder() {
                     ))}
                   </div>
                 )}
-
-                {sizeReady && (
-                  <div className="tf-ready">
-                    <div className="tf-current">
-                      <span>Current selection</span>
-                      <strong>{sizeLabel}</strong>
-                    </div>
-                    <button type="button" className="btn btn-dark tf-next" onClick={openLeadForm}>
-                      Get my quote <ArrowRight size={16} />
-                    </button>
-                  </div>
-                )}
               </div>
 
               <button type="button" className="tf-escape" onClick={startManual}>
@@ -325,7 +271,7 @@ export default function TyreFinder() {
             </>
           )}
 
-          {phase === 'sizes' && manualMode && (
+          {manualMode && (
             <div className="tf-manual">
               <p className="tf-panel-hint">Type the full size printed on your tyre, for example 225 / 45 R18 95V.</p>
               <label className="tf-field">
@@ -344,14 +290,6 @@ export default function TyreFinder() {
                 </p>
               )}
               <div className="tf-manual-actions">
-                <button
-                  type="button"
-                  className="btn btn-dark"
-                  onClick={openLeadForm}
-                  disabled={!sizeReady}
-                >
-                  Continue <ArrowRight size={16} />
-                </button>
                 <button type="button" className="tf-escape inline" onClick={useSizePicker}>
                   Choose from the list instead
                 </button>
@@ -359,18 +297,8 @@ export default function TyreFinder() {
             </div>
           )}
 
-          {phase === 'lead' && (
-            <form className="tf-lead" ref={formRef} onSubmit={handleSubmit}>
-              <div className="tf-lead-head">
-                <div>
-                  <span>Your tyre size</span>
-                  <strong>{sizeLabel}</strong>
-                </div>
-                <button type="button" className="tf-change" onClick={backToSizes}>
-                  Change size
-                </button>
-              </div>
-
+          {sizeReady && (
+            <div className="tf-actions">
               <fieldset className="tf-fieldset">
                 <legend>How many tyres do you need?</legend>
                 <div className="tf-quantity">
@@ -389,77 +317,35 @@ export default function TyreFinder() {
                 </div>
               </fieldset>
 
-              <input className="form-honey" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-
-              <div className="tf-form-grid">
-                <label className="tf-field">
-                  <span>Your name</span>
-                  <input required name="name" placeholder="e.g. Ahmed" autoComplete="name" />
-                </label>
-                <label className="tf-field">
-                  <span>Phone number</span>
-                  <input required name="phone" type="tel" placeholder="+971 5X XXX XXXX" autoComplete="tel" />
-                </label>
-                <label className="tf-field full">
-                  <span>Email address</span>
-                  <input required name="email" type="email" placeholder="you@example.com" autoComplete="email" />
-                </label>
-                <label className="tf-field full">
-                  <span>
-                    Notes <small>optional</small>
-                  </span>
-                  <textarea name="notes" placeholder="Brand preference, timing, or anything else we should know." />
-                </label>
+              <div className="tf-ready">
+                <div className="tf-current">
+                  <span>Current selection</span>
+                  <strong>{sizeLabel}</strong>
+                </div>
+                <a
+                  className="btn btn-dark tf-next"
+                  href={quoteHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setHandoff(true)}
+                >
+                  <MessageCircle size={16} /> Get my quote <ArrowRight size={16} />
+                </a>
               </div>
 
-              <button className="btn btn-dark tf-submit" type="submit" disabled={status === 'submitting'}>
-                {status === 'submitting' ? 'Sending request…' : 'Get my fitted quote'} <ArrowRight size={16} />
-              </button>
-              {status === 'error' && (
-                <p className="form-status error" role="alert">
-                  <AlertCircle size={17} /> We couldn’t send your request. Please call or WhatsApp us instead.
+              <p className="tf-handoff-note">
+                Opens WhatsApp with your tyre size and quantity ready to send — no form needed.
+              </p>
+
+              {handoff && (
+                <p className="tf-handoff" role="status">
+                  WhatsApp should be opening in a new tab with your request ready to send. Did not open?{' '}
+                  <a href={quoteHref} target="_blank" rel="noreferrer">
+                    Open the chat again
+                  </a>
+                  .
                 </p>
               )}
-              <span className="form-note">
-                <ShieldCheck size={14} /> No obligation. Your details stay private.
-              </span>
-            </form>
-          )}
-
-          {phase === 'success' && (
-            <div className="tf-success">
-              <span className="tf-success-icon">
-                <CheckCircle2 size={26} />
-              </span>
-              <h3>We’ve got your request.</h3>
-              <p>
-                We’ll check availability and pricing for <strong>{sizeLabel}</strong> and call you shortly with a fitted
-                quote.
-              </p>
-              <div className="tf-success-actions">
-                <a className="btn btn-dark" href={phoneLink}>
-                  <Phone size={16} /> Call {phone}
-                </a>
-                <a className="btn btn-glass-dark" href={whatsapp} target="_blank" rel="noreferrer">
-                  <MessageCircle size={16} /> WhatsApp us
-                </a>
-              </div>
-              <button
-                type="button"
-                className="tf-escape inline"
-                onClick={() => {
-                  setPhase('sizes')
-                  setWidth(null)
-                  setHeight(null)
-                  setRim(null)
-                  setManualSize('')
-                  setManualMode(false)
-                  setActiveStep(1)
-                  setStatus('idle')
-                }}
-              >
-                Search another size
-              </button>
             </div>
           )}
         </div>
