@@ -114,7 +114,7 @@ function App() {
               <label>Your name<input required name="name" placeholder="e.g. Ahmed" autoComplete="name" /></label>
               <label>Phone number<input required name="phone" type="tel" placeholder="+971 5X XXX XXXX" autoComplete="tel" /></label>
               <label>Email address<input name="email" type="email" placeholder="you@example.com" autoComplete="email" /></label>
-              <label>Service needed<select required name="service"><option value="">Select a service</option><option>Puncture repair</option><option>Battery testing & replacement</option><option>Wheel alignment</option><option>Brake service</option><option>Mechanical & engine repair</option><option>Car Denting Painting</option><option>Electrical Repair</option></select></label>
+              <label>Service needed<select required name="service"><option value="">Select a service</option><option>Tyre replacement</option><option>Puncture repair</option><option>Battery testing & replacement</option><option>Wheel alignment</option><option>Brake service</option><option>Mechanical & engine repair</option><option>Car Denting Painting</option><option>Electrical Repair</option></select></label>
             </div>
             <button className="btn btn-dark form-submit" type="submit" disabled={leadStatus === 'submitting'}>{leadStatus === 'submitting' ? 'Sending request…' : leadStatus === 'success' ? 'Send another request' : 'Request a callback'} <ArrowRight size={17} /></button>
             {leadStatus === 'success' && <p className="form-status success" role="status"><CheckCircle2 size={17} /> Thanks—your request has been received. We’ll call you shortly.</p>}
