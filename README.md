@@ -25,13 +25,22 @@ Edit the `CATALOGUE` array in `src/data/tyreSizes.ts`. Only valid, orderable com
 
 Only the hero callback form submits lead data. The tyre size finder does not — it hands the customer to WhatsApp.
 
-The form posts to **formsubmit.co** using the business inbox address from `src/lib/site.ts` (`businessEmail`, currently `fandttyres@gmail.com`), so leads arrive by email at that inbox. The formsubmit settings — `_subject`, `_template` and `lead_source` — live in `formSubmitConfig` in `src/lib/site.ts` and are merged into the request body in `src/lib/lead.ts`, so the form markup only contains the fields a visitor can actually see.
+A lead is sent to **two independent destinations**, and the form only reports a failure when every configured destination rejects it:
 
-The form keeps `action={formSubmitEndpoint}` as a no-JavaScript fallback; with JavaScript enabled it posts to the formsubmit AJAX endpoint and reports success or failure inline.
+1. **Google Sheets webhook** — `VITE_FORMSUBMIT_WEBHOOK_URL` points at the Apps Script web app in `google-sheets-lead-webhook.gs`, which appends a row to the "Leads" sheet. This is the source of truth. The request is sent as `text/plain` so the browser does not trigger a CORS preflight that Apps Script cannot answer.
+2. **formsubmit.co** — emails the notification to the business inbox (`businessEmail` in `src/lib/site.ts`). Fire and forget, so a formsubmit outage never blocks a lead that the sheet already captured.
+
+The formsubmit settings — `_subject`, `_template` and `lead_source` — live in `formSubmitConfig` in `src/lib/site.ts` and are merged into the request body in `src/lib/lead.ts`, so the form markup only contains the fields a visitor can actually see.
+
+The form keeps `action={formSubmitEndpoint}` as a no-JavaScript fallback; with JavaScript enabled it posts to both destinations and reports success or failure inline.
 
 Required fields are **name, phone and service**. Email is optional — when it is supplied it is still format-checked, so a lead can be captured from a phone-only enquiry.
 
-**One-time activation:** formsubmit.co emails an activation link to the inbox address on the first submission. Click that link before going live, otherwise submissions are not delivered.
+**Setup notes**
+
+- `VITE_FORMSUBMIT_WEBHOOK_URL` must be set in the deployment environment (it is set for Production, Preview and Development on Vercel) and in `.env.local` for local runs. Without it the form still works, but leads only reach formsubmit.co by email.
+- After changing `google-sheets-lead-webhook.gs` you must redeploy it: open the Apps Script project, paste the updated file, then use **Deploy → Manage deployments → edit → Version: New version → Deploy**.
+- formsubmit.co needs a one-time activation: it emails an activation link to the inbox address on the first submission. Click that link before relying on email delivery.
 
 ## Brand asset credits
 Vehicle manufacturer marks in `public/images/logos/` are sourced from Wikimedia Commons and keep their original brand colours:
