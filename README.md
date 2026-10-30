@@ -25,11 +25,13 @@ Edit the `CATALOGUE` array in `src/data/tyreSizes.ts`. Only valid, orderable com
 
 Only the hero callback form submits lead data. The tyre size finder does not — it hands the customer to WhatsApp.
 
-`VITE_FORMSUBMIT_WEBHOOK_URL` points at a Google Apps Script web app (`google-sheets-lead-webhook.gs`) that appends a row to the "Leads" sheet. The sheet columns are created automatically on the first write after the script is deployed.
+The form posts to **formsubmit.co** using the business inbox address from `src/lib/site.ts` (`businessEmail`, currently `fandttyres@gmail.com`), so leads arrive by email at that inbox. The formsubmit settings — `_subject`, `_template` and `lead_source` — live in `formSubmitConfig` in `src/lib/site.ts` and are merged into the request body in `src/lib/lead.ts`, so the form markup only contains the fields a visitor can actually see.
+
+The form keeps `action={formSubmitEndpoint}` as a no-JavaScript fallback; with JavaScript enabled it posts to the formsubmit AJAX endpoint and reports success or failure inline.
 
 Required fields are **name, phone and service**. Email is optional — when it is supplied it is still format-checked, so a lead can be captured from a phone-only enquiry.
 
-**After changing `google-sheets-lead-webhook.gs` you must redeploy it:** open the Apps Script project, paste the updated file, then use **Deploy → Manage deployments → edit → Version: New version → Deploy**. Until that happens the running script keeps the old column set and new fields are not written.
+**One-time activation:** formsubmit.co emails an activation link to the inbox address on the first submission. Click that link before going live, otherwise submissions are not delivered.
 
 ## Brand asset credits
 Vehicle manufacturer marks in `public/images/logos/` are sourced from Wikimedia Commons and keep their original brand colours:

@@ -109,7 +109,6 @@ svg.lucide-phone{color:#E53935!important}
 .form-status svg{flex:none;margin-top:1px}
 .form-status.success{background:#eef8e6;color:#3f641e}
 .form-status.error{background:#fff0f0;color:#9a2c2c}
-.form-honey{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 .hero-form textarea{display:block;width:100%;min-height:78px;resize:vertical;border:1px solid #e2e2da;background:#fff;border-radius:4px;padding:10px 12px;margin-top:6px;outline:none;font:inherit;font-size:11px;color:#30332d}
 .hero-form textarea:focus{border-color:#8753A1;box-shadow:0 0 0 3px #CCA5CE55}
 .optional-label{color:#8a8c84;font-weight:500;margin-left:4px}

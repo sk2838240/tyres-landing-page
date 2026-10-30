@@ -63,12 +63,10 @@ function App() {
     const form = event.currentTarget
     const data = new FormData(form)
     const payload = buildLeadPayload({
-      _honey: String(data.get('_honey') ?? ''),
       name: String(data.get('name') ?? '').trim(),
       phone: String(data.get('phone') ?? '').trim(),
       email: String(data.get('email') ?? '').trim(),
       service: String(data.get('service') ?? '').trim(),
-      lead_source: 'Callback form',
     })
     setLeadStatus('submitting')
 
@@ -105,11 +103,6 @@ function App() {
           </div>
           <form className="hero-form" id="callback" action={formSubmitEndpoint} method="POST" onSubmit={submitLead}>
             <div className="form-kicker">NEED OUR HELP?</div><h2>Request a callback</h2><p>Tell us what you need and we’ll confirm the next step.</p>
-            <input type="hidden" name="_subject" value="New website lead — F&T Auto Services" readOnly />
-            <input type="hidden" name="_template" value="table" readOnly />
-            <input type="hidden" name="_url" value={window.location.href} readOnly />
-            <input type="hidden" name="page_url" value={window.location.href} readOnly />
-            <input className="form-honey" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <div className="form-grid">
               <label>Your name<input required name="name" placeholder="e.g. Ahmed" autoComplete="name" /></label>
               <label>Phone number<input required name="phone" type="tel" placeholder="+971 5X XXX XXXX" autoComplete="tel" /></label>
