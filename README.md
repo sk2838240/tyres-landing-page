@@ -21,26 +21,24 @@ Single-page marketing site for F&T Auto Services (Al Quoz 3, Dubai tyre shop and
 
 Edit the `CATALOGUE` array in `src/data/tyreSizes.ts`. Only valid, orderable combinations belong in the list — remove anything you cannot supply. Customers whose size is missing can still use the "My size isn't listed" escape hatch, so the catalogue never has to block a lead.
 
-## Lead capture endpoints
+## Lead capture
 
-Only the hero callback form submits lead data. The tyre size finder does not — it hands the customer to WhatsApp.
+Both enquiries on the site end up in the same place: a **WhatsApp chat**. No form posts to a third-party service any more.
 
-A lead is sent to **two independent destinations**, and the form only reports a failure when every configured destination rejects it:
+- **Hero callback form** (`src/App.tsx`) — the visitor picks a service, fills in name, phone and (optional) email, and "Continue on WhatsApp" opens a chat with those details pre-filled. The message reads:
+  ```
+  Hi F&T Auto Services, I would like a callback for {service}.
 
-1. **Google Sheets webhook** — `VITE_FORMSUBMIT_WEBHOOK_URL` points at the Apps Script web app in `google-sheets-lead-webhook.gs`, which appends a row to the "Leads" sheet. This is the source of truth. The request is sent as `text/plain` so the browser does not trigger a CORS preflight that Apps Script cannot answer.
-2. **formsubmit.co** — emails the notification to the business inbox (`businessEmail` in `src/lib/site.ts`). Fire and forget, so a formsubmit outage never blocks a lead that the sheet already captured.
+  Name: {name}
+  Phone: {phone}
+  Email: {email}
+  ```
+  The email line is only included when the visitor supplied one. If the browser blocks the new tab, the form shows a link to open the same chat manually.
+- **Tyre size finder** — hands the customer to WhatsApp with the tyre size and quantity, as described above.
 
-The formsubmit settings — `_subject`, `_template` and `lead_source` — live in `formSubmitConfig` in `src/lib/site.ts` and are merged into the request body in `src/lib/lead.ts`, so the form markup only contains the fields a visitor can actually see.
+`src/lib/site.ts` exposes `whatsappLink(message)` for building both links, so the number and the message format live in one place.
 
-The form keeps `action={formSubmitEndpoint}` as a no-JavaScript fallback; with JavaScript enabled it posts to both destinations and reports success or failure inline.
-
-Required fields are **name, phone and service**. Email is optional — when it is supplied it is still format-checked, so a lead can be captured from a phone-only enquiry.
-
-**Setup notes**
-
-- `VITE_FORMSUBMIT_WEBHOOK_URL` must be set in the deployment environment (it is set for Production, Preview and Development on Vercel) and in `.env.local` for local runs. Without it the form still works, but leads only reach formsubmit.co by email.
-- After changing `google-sheets-lead-webhook.gs` you must redeploy it: open the Apps Script project, paste the updated file, then use **Deploy → Manage deployments → edit → Version: New version → Deploy**.
-- formsubmit.co needs a one-time activation: it emails an activation link to the inbox address on the first submission. Click that link before relying on email delivery.
+The old formsubmit.co and Google Sheets pipeline has been removed (`src/lib/lead.ts` and the `formSubmit*` settings in `src/lib/site.ts`). `google-sheets-lead-webhook.gs` is kept in the repo for reference but is no longer wired to the site; the `VITE_FORMSUBMIT_WEBHOOK_URL` variable in `.env.local` and on Vercel is now unused and can be removed.
 
 ## Brand asset credits
 Vehicle manufacturer marks in `public/images/logos/` are sourced from Wikimedia Commons and keep their original brand colours:
