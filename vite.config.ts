@@ -19,7 +19,10 @@ export default defineConfig(async ({ mode }) => {
     processEnvDefines[`process.env.${key}`] = JSON.stringify(value);
   }
 
+  const base = env.VITE_BASE_PATH || '/tyre-shop-near-me/';
+
   return {
+    base,
     plugins,
     envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
     define: processEnvDefines,

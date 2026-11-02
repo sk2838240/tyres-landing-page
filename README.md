@@ -4,10 +4,22 @@ Single-page marketing site for F&T Auto Services (Al Quoz 3, Dubai tyre shop and
 
 ## Commands
 
-- `npm run dev` — start the dev server
+- `npm run dev` — start the dev server (serves the app at `http://localhost:5173/tyre-shop-near-me/`)
 - `npm run build` — type-check and build to `dist/`
 - `npm run lint` — run ESLint
 - `npm run preview` — serve the production build
+
+## Hosting (shared hosting, sub-folder)
+
+The site is built for **`https://tyreexperts.ae/tyre-shop-near-me/`**. It is a static build — no PHP, database or Node runtime is needed on the host.
+
+- **Base path** — `vite.config.ts` sets `base` from `VITE_BASE_PATH` and falls back to `/tyre-shop-near-me/`. Every asset URL is built from that base, so nothing breaks when the page lives in a sub-folder:
+  - files in `public/` are referenced through `assetUrl()` in `src/lib/site.ts` (logos, favicon);
+  - images used from CSS live in `src/assets/` and are bundled by Vite, which rewrites their URLs with the base path.
+- **Build** — `npm run build` writes `dist/` with the correct paths.
+- **Upload** — `production-upload/` (and `production-upload.zip`) hold the ready-to-upload copy: `index.html`, `assets/`, `images/`, `favicon.svg` and an `.htaccess` (directory index, no listing, long cache for hashed assets, gzip). Upload the **contents** of that folder into `public_html/tyre-shop-near-me/`.
+- **Different folder or domain root** — set `VITE_BASE_PATH` (for example `/` for a root install or `/another-folder/`) and rebuild; every path follows it.
+- The preview instrumentation that used to sit in `index.html` (session recorder, element picker, page-view beacon) has been removed, so the production page loads no third-party scripts other than Google Fonts and the Google Maps embed.
 
 ## Tyre size finder
 

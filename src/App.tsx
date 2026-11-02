@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { AlertCircle, ArrowRight, Battery, Check, CheckCircle2, ChevronDown, Clock3, Disc3, Droplets, Gauge, MapPin, Menu, MessageCircle, Phone, Radio, Settings, ShieldCheck, Star, Wrench, X } from 'lucide-react'
 import './App.css'
 import TyreFinder from './sections/TyreFinder'
-import { businessAddress, businessEmail, googleBusinessUrl, googleMapsEmbedUrl, phone, phoneLink, whatsapp, whatsappLink } from './lib/site'
+import { assetUrl, businessAddress, businessEmail, googleBusinessUrl, googleMapsEmbedUrl, phone, phoneLink, whatsapp, whatsappLink } from './lib/site'
 
 const services = [
   { icon: Disc3, title: 'Tyre Replacement', text: 'New tyre fitting, balancing and valve replacement for a safe, smooth drive at our Al Quoz 3 workshop.' },
@@ -26,12 +26,12 @@ const priceRows = [
   ['4×4 & off-road', '265/65 R17 · 275/55 R20', 'BFGoodrich · Dunlop · Toyo', 'AED 350–1,350'],
 ]
 const vehicles = [
-  { name: 'Mercedes-Benz tyres', size: 'Popular fitments: 225/45 R18 · 245/40 R19', pick: 'Michelin Primacy · Continental PremiumContact', price: 'From AED 420 / tyre', logo: '/images/logos/mercedes-benz.png', alt: 'Mercedes-Benz logo' },
-  { name: 'BMW tyres', size: 'Popular fitments: 225/45 R18 · 255/40 R19', pick: 'Bridgestone Potenza · Pirelli P Zero', price: 'From AED 390 / tyre', logo: '/images/logos/bmw.png', alt: 'BMW logo' },
-  { name: 'Audi tyres', size: 'Popular fitments: 245/40 R18 · 255/35 R19', pick: 'Continental SportContact · Michelin Pilot Sport', price: 'From AED 410 / tyre', logo: '/images/logos/audi.png', alt: 'Audi logo' },
-  { name: 'Range Rover tyres', size: 'Popular fitments: 255/55 R20 · 275/45 R21', pick: 'Pirelli Scorpion · Goodyear Eagle F1', price: 'From AED 690 / tyre', logo: '/images/logos/range-rover.png', alt: 'Land Rover Range Rover logo' },
-  { name: 'Porsche tyres', size: 'Popular fitments: 235/40 R19 · 295/35 R20', pick: 'Michelin Pilot Sport · Pirelli P Zero', price: 'From AED 780 / tyre', logo: '/images/logos/porsche.png', alt: 'Porsche logo' },
-  { name: 'Toyota Land Cruiser tyres', size: 'Popular fitments: 265/65 R17 · 275/55 R20', pick: 'Dunlop Grandtrek · Bridgestone Dueler', price: 'From AED 460 / tyre', logo: '/images/logos/toyota.png', alt: 'Toyota logo' },
+  { name: 'Mercedes-Benz tyres', size: 'Popular fitments: 225/45 R18 · 245/40 R19', pick: 'Michelin Primacy · Continental PremiumContact', price: 'From AED 420 / tyre', logo: assetUrl('images/logos/mercedes-benz.png'), alt: 'Mercedes-Benz logo' },
+  { name: 'BMW tyres', size: 'Popular fitments: 225/45 R18 · 255/40 R19', pick: 'Bridgestone Potenza · Pirelli P Zero', price: 'From AED 390 / tyre', logo: assetUrl('images/logos/bmw.png'), alt: 'BMW logo' },
+  { name: 'Audi tyres', size: 'Popular fitments: 245/40 R18 · 255/35 R19', pick: 'Continental SportContact · Michelin Pilot Sport', price: 'From AED 410 / tyre', logo: assetUrl('images/logos/audi.png'), alt: 'Audi logo' },
+  { name: 'Range Rover tyres', size: 'Popular fitments: 255/55 R20 · 275/45 R21', pick: 'Pirelli Scorpion · Goodyear Eagle F1', price: 'From AED 690 / tyre', logo: assetUrl('images/logos/range-rover.png'), alt: 'Land Rover Range Rover logo' },
+  { name: 'Porsche tyres', size: 'Popular fitments: 235/40 R19 · 295/35 R20', pick: 'Michelin Pilot Sport · Pirelli P Zero', price: 'From AED 780 / tyre', logo: assetUrl('images/logos/porsche.png'), alt: 'Porsche logo' },
+  { name: 'Toyota Land Cruiser tyres', size: 'Popular fitments: 265/65 R17 · 275/55 R20', pick: 'Dunlop Grandtrek · Bridgestone Dueler', price: 'From AED 460 / tyre', logo: assetUrl('images/logos/toyota.png'), alt: 'Toyota logo' },
 ]
 const repairs = ['Engine diagnostics & computer scanning', 'Brake pads & disc skimming', 'Car AC repair & gas recharge', 'Suspension repair', 'Minor & major car service packages', 'Gearbox & transmission service']
 const faqs = [
@@ -89,7 +89,7 @@ function App() {
   return <>
     <div className="topline"><span><MapPin size={14} /> Al Quoz 3, Dubai · Tyre & auto repair workshop</span><a href={phoneLink}><Phone size={14} /> {phone}</a><span className="hours"><Clock3 size={14} /> Daily, 8:30 AM – 7:30 PM [Sunday Off]</span></div>
     <header className="site-header">
-      <a className="brand" href="#home" aria-label="F and T Auto Services home"><img className="brand-logo" src="/images/logos/ftlogonew.webp" alt="F&T Auto Services" /></a>
+      <a className="brand" href="#home" aria-label="F and T Auto Services home"><img className="brand-logo" src={assetUrl('images/logos/ftlogonew.webp')} alt="F&T Auto Services" /></a>
       <button className="mobile-toggle" aria-label="Toggle navigation" onClick={() => setMobileOpen(!mobileOpen)}>{mobileOpen ? <X /> : <Menu />}</button>
       <nav className={mobileOpen ? 'nav-links open' : 'nav-links'}>
         <a onClick={() => setMobileOpen(false)} href="#services">Services</a><a onClick={() => setMobileOpen(false)} href="#tyre-finder">Find tyre size</a><a onClick={() => setMobileOpen(false)} href="#tyres">Tyres & prices</a><a onClick={() => setMobileOpen(false)} href="#vehicles">By vehicle</a><a onClick={() => setMobileOpen(false)} href="#workshop">Workshop</a><a onClick={() => setMobileOpen(false)} href="#faq">FAQs</a>
@@ -161,7 +161,7 @@ function App() {
       <section className="contact-section" id="contact"><div><span className="eyebrow">COME BY OR CALL US</span><h2>F&T Auto Services<br /><em>Dubai workshop</em></h2><p>Tyre fitting and car repair workshop in Al Quoz 3, Dubai.</p><div className="contact-details"><span><MapPin size={18} /><span><strong>Workshop</strong><br />{businessAddress}</span></span><span><Clock3 size={18} /><span><strong>Opening hours</strong><br />Daily, 8:30 AM – 7:30 PM [Sunday Off] · Please call ahead</span></span><span><Phone size={18} /><span><strong>Phone</strong><br /><a href={phoneLink}>{phone}</a></span></span><span><MessageCircle size={18} /><span><strong>Email</strong><br /><a href={`mailto:${businessEmail}`}>{businessEmail}</a></span></span></div><div className="hero-actions"><a className="btn btn-lime" href={phoneLink}><Phone size={17} /> Call the workshop</a><a className="btn btn-glass" href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={17} /> WhatsApp</a></div></div><div className="map-card"><iframe src={googleMapsEmbedUrl} width="600" height="450" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" title="F&T Auto Services location map" /><div className="map-label"><MapPin size={18} /><div><strong>F&T Auto Services</strong><span>Al Quoz 3 · Dubai</span></div><a href={googleBusinessUrl} target="_blank" rel="noreferrer">Directions <ArrowRight size={14} /></a></div></div></section>
     </main>
 
-    <footer className="footer"><a className="brand footer-brand" href="#home"><img className="brand-logo" src="/images/logos/ftlogonew.webp" alt="F&T Auto Services" /></a><p>Tyre fitting and car repair services at our Al Quoz 3 workshop.</p><div><a href={phoneLink}><Phone size={15} /> Call</a><a href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={15} /> WhatsApp</a><a href={`mailto:${businessEmail}`}>{businessEmail}</a><a href="#faq">FAQs</a><a href="#contact">Contact</a></div><small>© {new Date().getFullYear()} F&T Auto Services · Dubai, UAE. Prices shown are indicative; confirm exact specifications and availability before booking.</small></footer>
+    <footer className="footer"><a className="brand footer-brand" href="#home"><img className="brand-logo" src={assetUrl('images/logos/ftlogonew.webp')} alt="F&T Auto Services" /></a><p>Tyre fitting and car repair services at our Al Quoz 3 workshop.</p><div><a href={phoneLink}><Phone size={15} /> Call</a><a href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={15} /> WhatsApp</a><a href={`mailto:${businessEmail}`}>{businessEmail}</a><a href="#faq">FAQs</a><a href="#contact">Contact</a></div><small>© {new Date().getFullYear()} F&T Auto Services · Dubai, UAE. Prices shown are indicative; confirm exact specifications and availability before booking.</small></footer>
     <div className="mobile-sticky"><a href={phoneLink}><Phone size={17} /> Call now</a><a href={whatsapp} target="_blank" rel="noreferrer"><MessageCircle size={17} /> WhatsApp</a></div>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'AutoRepair', name: 'F&T Auto Services', telephone: phone, email: businessEmail, address: { '@type': 'PostalAddress', streetAddress: businessAddress, addressLocality: 'Dubai', addressCountry: 'AE' }, openingHours: 'Mo-Sa 08:30-19:30', priceRange: 'AED 75+' }) }} />
   </>
