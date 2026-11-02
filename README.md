@@ -19,6 +19,7 @@ The site is built for **`https://tyreexperts.ae/tyre-shop-near-me/`**. It is a s
 - **Build** — `npm run build` writes `dist/` with the correct paths.
 - **Upload** — `production-upload/` (and `production-upload.zip`) hold the ready-to-upload copy: `index.html`, `assets/`, `images/`, `favicon.svg` and an `.htaccess` (directory index, no listing, long cache for hashed assets, gzip). Upload the **contents** of that folder into `public_html/tyre-shop-near-me/`.
 - **Different folder or domain root** — set `VITE_BASE_PATH` (for example `/` for a root install or `/another-folder/`) and rebuild; every path follows it.
+- **File names** — the host rewrites any URL containing `_` with a 301 to a dash version that does not exist, which silently kills the stylesheet. `vite.config.ts` therefore builds with `hashCharacters: 'hex'`, so every asset name is lowercase and underscore-free. Keep it that way if the build config is changed.
 - The preview instrumentation that used to sit in `index.html` (session recorder, element picker, page-view beacon) has been removed, so the production page loads no third-party scripts other than Google Fonts and the Google Maps embed.
 
 ## Tyre size finder

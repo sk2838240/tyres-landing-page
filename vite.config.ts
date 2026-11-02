@@ -26,5 +26,17 @@ export default defineConfig(async ({ mode }) => {
     plugins,
     envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
     define: processEnvDefines,
+    build: {
+      rollupOptions: {
+        output: {
+          // Some shared hosts rewrite URLs that contain "_" (301 -> file not found),
+          // so build file names with lowercase hex hashes only.
+          hashCharacters: 'hex' as const,
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]',
+        },
+      },
+    },
   };
 })
